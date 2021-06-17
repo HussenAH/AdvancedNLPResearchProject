@@ -61,12 +61,15 @@ def main():
         type=str,
         help="Directory of pre-trained model."
     )
-    args = parser.parse_args()
+    #args = parser.parse_args()
 
     # Load fine-tuned model and vocabulary
     print("Loading model...")
-    model = BertWSD.from_pretrained(args.model_dir)
-    tokenizer = BertTokenizer.from_pretrained(args.model_dir)
+    _model_dir = "/Users/hussenabuhamad/Google Drive/Git/AdvancedNLPResearchProject/src/BERT_WSD/model/bert_large-augmented-batch_size=128-lr=2e-5-max_gloss=6"
+    model = BertWSD.from_pretrained(_model_dir)
+    tokenizer = BertTokenizer.from_pretrained(_model_dir)
+    # model = BertWSD.from_pretrained(args.model_dir)
+    # tokenizer = BertTokenizer.from_pretrained(args.model_dir)
     model.to(DEVICE)
     model.eval()
 
