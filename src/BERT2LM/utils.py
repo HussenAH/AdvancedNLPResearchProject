@@ -1,15 +1,13 @@
-import argparse
 import re
 
 import torch
-from tabulate import tabulate
 from torch.nn.functional import softmax
 from tqdm import tqdm
 from transformers import BertTokenizer
 
-from utils.dataset import GlossSelectionRecord, _create_features_from_records
-from utils.model import BertWSD, forward_gloss_selection
-from utils.wordnet import get_glosses
+from ..BERT_WSD.script.utils.dataset import GlossSelectionRecord, _create_features_from_records
+from ..BERT_WSD.script.utils.model import BertWSD, forward_gloss_selection
+from ..BERT_WSD.script.utils.wordnet import get_glosses
 
 MAX_SEQ_LENGTH = 128
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -51,37 +49,13 @@ def get_predictions(model, tokenizer, sentence):
     return sorted(zip(sense_keys, definitions, scores), key=lambda x: x[-1], reverse=True)
 
 
-def main():
-    parser = argparse.ArgumentParser()
-
-    # Required parameters
-    parser.add_argument(
-        "model_dir",
-        default=None,
-        type=str,
-        help="Directory of pre-trained model."
-    )
-    args = parser.parse_args()
-
-    # Load fine-tuned model and vocabulary
+def load_bert_wsd_model(model_dir):
     print("Loading model...")
-    model = BertWSD.from_pretrained(args.model_dir)
-    tokenizer = BertTokenizer.from_pretrained(args.model_dir)
+
+    model = BertWSD.from_pretrained(model_dir)
+    tokenizer = BertTokenizer.from_pretrained(model_dir)
+
     model.to(DEVICE)
     model.eval()
+    return model, tokenizer
 
-    while True:
-        sentence = input("\nEnter a sentence with an ambiguous word surrounded by [TGT] tokens\n> ")
-        predictions = get_predictions(model, tokenizer, sentence)
-        if predictions:
-            print("\nPredictions:")
-            print(tabulate(
-                [[f"{i+1}.", key, gloss, f"{score:.5f}"] for i, (key, gloss, score) in enumerate(predictions)],
-                headers=["No.", "Sense key", "Definition", "Score"])
-            )
-            # for i, (sense_key, definition, score) in enumerate(predictions):
-            #     # print(f"  {i + 1:>3}. sense key: {sense_key:<15} score: {score:<8.5f} definition: {definition}")
-
-
-if __name__ == '__main__':
-    main()
