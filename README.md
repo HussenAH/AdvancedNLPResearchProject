@@ -1,14 +1,14 @@
 # AdvancedNLPResearchProject
-RESEARCH PROJECT PROPOSAL
+## RESEARCH PROJECT PROPOSAL
 
-Natural Language Processing, Tel-Aviv University
-June 2021
+### Natural Language Processing, Tel-Aviv University.  
+#### June 2021
 
-Research Project Topic:  Can we solve the Word Sense Disambiguation using language model and              translation to a target language?
+**Research Project Topic:**  Can we solve the Word Sense Disambiguation using language model and              translation to a target language?
 
-Student: Hussen Abu Hamad. ID:303153043 Mail: hussena@mail.tau.ac.il
+**Student:** Hussen Abu Hamad. **Mail:** hussena@mail.tau.ac.il
 
-Abstract
+## Abstract
 
 Word Sense Disambiguation (WSD) is a task which aims to identify the meaning of a word given its context. This problem has been investigated and analyzed in depth in English. 
 
