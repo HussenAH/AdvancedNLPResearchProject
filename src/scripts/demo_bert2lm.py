@@ -5,8 +5,13 @@ from tabulate import tabulate
 import argparse
 from src.BERT2LM import utils
 
+
+
+
+
+
 MODEL_DIR_MAP = {
-    "BERT-large-augmented" : "",
+    "BERT-large-augmented" : "../BERT_WSD/model/bert_large-augmented-batch_size=128-lr=2e-5-max_gloss=6",
     "BERT-large-baseline": "../BERT_WSD/model/bert_large-batch_size=128-lr=2e-5-max_gloss=6"
 }
 
@@ -17,7 +22,6 @@ def get_model_dir(type):
         type, MODEL_DIR_MAP))
 
 def main(model_type):
-
     _model_dir = get_model_dir(model_type)
 
     # Load fine-tuned model and vocabulary
@@ -26,7 +30,7 @@ def main(model_type):
     while True:
         try:
             sentence = input("\nEnter a sentence with an ambiguous word surrounded by [TGT] tokens\n> ")
-            predictions = utils.get_predictions(model, tokenizer, sentence)
+            predictions = utils.get_wsd_predictions(model, tokenizer, sentence)
             if predictions:
                 print("\nPredictions:")
                 print(tabulate(
@@ -38,9 +42,14 @@ def main(model_type):
         except  Exception as e:
             print(str(e))
 
+def test_lm():
+    #utils.load_lm_model("")
+    utils.load_arabert_lm_model("aubmindlab/bert-large-arabertv02")
+    pass
 
-main("BERT-large-baseline")
-
+# main("BERT-large-baseline")
+#main("BERT-large-augmented")
+test_lm()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

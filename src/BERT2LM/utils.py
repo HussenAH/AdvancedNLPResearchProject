@@ -1,6 +1,14 @@
 import re
 
 import torch
+from fastai.callback.tracker import SaveModelCallback
+from fastai.text.learner import language_model_learner
+from fastai.text.models import AWD_LSTM
+from pathlib import Path
+from pandas.io import pickle
+from sklearn.datasets._base import load_data
+
+
 from torch.nn.functional import softmax
 from tqdm import tqdm
 from transformers import BertTokenizer
@@ -9,11 +17,24 @@ from ..BERT_WSD.script.utils.dataset import GlossSelectionRecord, _create_featur
 from ..BERT_WSD.script.utils.model import BertWSD, forward_gloss_selection
 from ..BERT_WSD.script.utils.wordnet import get_glosses
 
+
+
+from fastai.text.all import *
+
+
+import torch
+from pytorch_pretrained_bert import BertTokenizer,BertForMaskedLM
+import pandas as pd
+import math
+from transformers import AutoTokenizer, AutoModel, AutoModelForMaskedLM
+from arabert.preprocess import ArabertPreprocessor
+
+
 MAX_SEQ_LENGTH = 128
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def get_predictions(model, tokenizer, sentence):
+def get_wsd_predictions(model, tokenizer, sentence):
     re_result = re.search(r"\[TGT\](.*)\[TGT\]", sentence)
     if re_result is None:
         print("\nIncorrect input format. Please try again.")
@@ -58,4 +79,48 @@ def load_bert_wsd_model(model_dir):
     model.to(DEVICE)
     model.eval()
     return model, tokenizer
+
+
+
+
+
+def load_arabert_lm_model(model_dir):
+    print("Loading model...")
+
+    model_name = "aubmindlab/bert-large-arabertv02"
+    lm_bertMaskedLM = AutoModelForMaskedLM.from_pretrained(model_name)
+    lm_tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+
+    model = BertWSD.from_pretrained(model_dir)
+    tokenizer = BertTokenizer.from_pretrained(model_dir)
+
+    model.to(DEVICE)
+    model.eval()
+    return model, tokenizer
+
+def get_score(sentence, lm_tokenizer, lm_bertMaskedLM):
+    tokenize_input = lm_tokenizer.tokenize(sentence)
+    tensor_input = torch.tensor([lm_tokenizer.convert_tokens_to_ids(tokenize_input)])
+    predictions=lm_bertMaskedLM(tensor_input)
+    #print(predictions[0])
+    loss_fct = torch.nn.CrossEntropyLoss()
+    loss = loss_fct(predictions[0].squeeze(),tensor_input.squeeze()).data
+    #print(loss.data)
+    return math.exp(loss)
+#
+
+
+# model_name = "aubmindlab/bert-base-arabertv2"
+# lm_bertMaskedLM = None #AutoModelForMaskedLM.from_pretrained(model_name)
+# lm_tokenizer = None #AutoTokenizer.from_pretrained(model_name)
+#
+# def get_score(sentence):
+#     tokenize_input = lm_tokenizer.tokenize(sentence)
+#     tensor_input = torch.tensor([lm_tokenizer.convert_tokens_to_ids(tokenize_input)])
+#     predictions=lm_bertMaskedLM(tensor_input)
+#     #print(predictions[0])
+#     loss_fct = torch.nn.CrossEntropyLoss()
+#     loss = loss_fct(predictions[0].squeeze(),tensor_input.squeeze()).data
+#     return math.exp(loss)
 
