@@ -5,8 +5,7 @@ from tabulate import tabulate
 import argparse
 from src.BERT2LM import utils
 
-
-
+from googletrans import Translator
 
 
 
@@ -41,6 +40,11 @@ def main(model_type):
                 #     # print(f"  {i + 1:>3}. sense key: {sense_key:<15} score: {score:<8.5f} definition: {definition}")
         except  Exception as e:
             print(str(e))
+# def translate():
+#     translator = Translator()
+#     t= translator.translate('What’s the Eid al-Adha DATE', dest='ar')
+#     print(t.orgin,t.text)
+
 
 def test_lm():
     #utils.load_lm_model("")
@@ -48,8 +52,9 @@ def test_lm():
     pass
 
 # main("BERT-large-baseline")
-#main("BERT-large-augmented")
-test_lm()
+main("BERT-large-augmented")
+# test_lm()
+# translate()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -63,3 +68,6 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     main(args.model_type)
+
+
+
